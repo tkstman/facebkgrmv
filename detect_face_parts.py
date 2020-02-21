@@ -15,9 +15,9 @@ destinationfolder="C:/Users/tstone/Documents/Python/processed"
 def signPxlVar(firstPxTuple, secPxTuple,percent):
 	if len(firstPxTuple) == len(secPxTuple):
 		for x,y in zip(firstPxTuple,secPxTuple):
-			if(x!=y or (abs(x-y)/x)*100 <percent):
-				return False
-				 
+			if((abs(x-y)/x)*100 >percent):
+				return True
+	return False			 
 
 
 
@@ -43,19 +43,27 @@ for sourcepath,dirs,files in os.walk(sourcefolder):
 			#These colors will be removed from the image
 			listoCol = []
 			allpixels =[]
-			for x in range(70):
+			for x in range(30):
 				for y in range(150):
 					if(pix[x,y] not in listoCol):						
 						listoCol.append(pix[x,y])
 						#print(pix[x, y])
 						
+			#Get the pixels that are within the percentage provided	
+			for pxFromSample in listoCol:
+				for x in range(im.size[0]):
+					for y in range(im.size[1]):					
+						if not signPxlVar(pxFromSample,pix[x, y],20):
+							pix[x, y] = (255, 255, 255, 255)
+
+
 						#print("new pixel value: ",pix[x, y])
 			#im = im.convert("P",palette=Image.ADAPTIVE,colors=256)
-			for x in range(im.size[0]):
-				for y in range(im.size[1]):
-					allpixels.append(pix[x, y])
-					if pix[x, y] in listoCol:
-						pix[x, y] = (255, 255, 255, 255)
+			#for x in range(im.size[0]):
+			#	for y in range(im.size[1]):
+			#		allpixels.append(pix[x, y])
+			#		if pix[x, y] in listoCol:
+			#			pix[x, y] = (255, 255, 255, 255)
 			#acsvfile = np.asarray(allpixels)
 			#np.savetxt("img.csv",allpixels,fmt="%d", delimiter=",")
 			im.show()
