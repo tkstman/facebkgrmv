@@ -6,6 +6,7 @@ import argparse
 import imutils
 import dlib
 import cv2
+from matplotlib import pyplot as plt
 
 
 
@@ -29,33 +30,54 @@ for sourcepath,dirs,files in os.walk(sourcefolder):
 			#ap.add_argument("-p", "--shape-predictor", required=True, help="path to facial landmark predictor")
 			#ap.add_argument("-i","--image", required=True, help="path to input image")
 			#args = vars(ap.parse_args())
-			detector = dlib.get_frontal_face_detector()
-			predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
+			# detector = dlib.get_frontal_face_detector()
+			# predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 			#predictor = dlib.shape_predictor(args["shape_predictor"])
 			image = cv2.imread(os.path.join(sourcepath,file_))
 			
-			im = Image.open(os.path.join(sourcepath,file_))
-			im = im.convert("RGBA")
-			pix = im.load()
-			data = np.array(im)
+			imagegray = cv2.cvtColor(image,cv2.COLOR_BGR2RGB) #change to grayscale COLOR_BGR2RGBA COLOR_RGB2BGR
+			cv2.imshow('image with gray',imagegray)
+			ret, thresh1 = cv2.threshold(imagegray,190,255,cv2.THRESH_BINARY)
+			kernel = np.ones((5,5), np.uint8)
+			erosion = cv2.erode(thresh1,kernel,iterations=0)
+
+			opening= cv2.morphologyEx(erosion,cv2.MORPH_OPEN,kernel)
+			closing= cv2.morphologyEx(opening,cv2.MORPH_CLOSE,kernel)
+
+			plt.imshow(closing,'gray')
+			plt.xticks([]), plt.yticks([])
+			plt.show()
+
+			contours, hierarchy = cv2.findContours(closing,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+
+			cv2.imshow('imagegray',closing)
+			cv2.drawContours(closing,contours,-1,(255,255,255),4)
+			cv2.waitKey(0)
+
+
+
+			#im = Image.open(os.path.join(sourcepath,file_))
+			#im = im.convert("RGBA")
+			#pix = im.load()
+			#data = np.array(im)
 
 			#Get all the colors in a 10 x 10 pixel box at the top left of the image
 			#These colors will be removed from the image
-			listoCol = []
+			""" listoCol = []
 			allpixels =[]
 			for x in range(30):
 				for y in range(150):
 					if(pix[x,y] not in listoCol):						
-						listoCol.append(pix[x,y])
+						listoCol.append(pix[x,y]) """
 						#print(pix[x, y])
 						
 			#Get the pixels that are within the percentage provided	
-			for pxFromSample in listoCol:
+			""" for pxFromSample in listoCol:
 				for x in range(im.size[0]):
 					for y in range(im.size[1]):					
 						if not signPxlVar(pxFromSample,pix[x, y],20):
 							pix[x, y] = (255, 255, 255, 255)
-
+ """
 
 						#print("new pixel value: ",pix[x, y])
 			#im = im.convert("P",palette=Image.ADAPTIVE,colors=256)
@@ -66,7 +88,7 @@ for sourcepath,dirs,files in os.walk(sourcefolder):
 			#			pix[x, y] = (255, 255, 255, 255)
 			#acsvfile = np.asarray(allpixels)
 			#np.savetxt("img.csv",allpixels,fmt="%d", delimiter=",")
-			im.show()
+			# im.show()
 			#print(pix[x,y])
 			#pix.show
 			#print(data)
@@ -80,12 +102,12 @@ for sourcepath,dirs,files in os.walk(sourcefolder):
 			
 			#image = cv2.imread(args["image"])
 			#image = imutils.resize(image, width=500)
-			gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+			""" gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-			rects = detector(gray,1)
+			rects = detector(gray,1) """
 
 			# loop over the face detections
-			for (i, rect) in enumerate(rects):
+			""" for (i, rect) in enumerate(rects):
 				# determine the facial landmarks for the face region, then
 				# convert the facial landmark (x, y)-coordinates to a NumPy
 				# array
@@ -105,5 +127,5 @@ for sourcepath,dirs,files in os.walk(sourcefolder):
 			# show the output image with the face detections + facial landmarks
 			cv2.imshow(file_, image)
 			cv2.waitKey(0)
-			break
+			break """
 		break
