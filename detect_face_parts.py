@@ -35,9 +35,16 @@ for sourcepath,dirs,files in os.walk(sourcefolder):
 			#predictor = dlib.shape_predictor(args["shape_predictor"])
 			image = cv2.imread(os.path.join(sourcepath,file_))
 			
-			imagegray = cv2.cvtColor(image,cv2.COLOR_BGR2RGB) #change to grayscale COLOR_BGR2RGBA COLOR_RGB2BGR
-			cv2.imshow('image with gray',imagegray)
-			ret, thresh1 = cv2.threshold(imagegray,190,255,cv2.THRESH_BINARY)
+			imagegray = cv2.cvtColor(image,cv2.COLOR_BGR2YUV) #change to grayscale COLOR_BGR2RGBA COLOR_RGB2BGR
+			imageenhanced = cv2.cvtColor(imagegray, cv2.COLOR_BGR2YUV)
+			imageenhanced[:,:,0] = cv2.equalizeHist(imageenhanced[:,:,0])
+
+			imageenhancedrgb = cv2.cvtColor(imageenhanced,cv2.COLOR_YUV2RGB)
+			plt.imshow(imageenhancedrgb)#, plt.axis("off")
+			plt.show()
+
+			#cv2.imshow('image with gray',imagegray)
+			ret, thresh1 = cv2.threshold(imageenhancedrgb,130,255,cv2.THRESH_BINARY)
 			kernel = np.ones((5,5), np.uint8)
 			erosion = cv2.erode(thresh1,kernel,iterations=0)
 
@@ -50,9 +57,9 @@ for sourcepath,dirs,files in os.walk(sourcefolder):
 
 			contours, hierarchy = cv2.findContours(closing,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 
-			cv2.imshow('imagegray',closing)
-			cv2.drawContours(closing,contours,-1,(255,255,255),4)
-			cv2.waitKey(0)
+			#cv2.imshow('imagegray',closing)
+			#cv2.drawContours(closing,contours,-1,(255,255,255),4)
+			#cv2.waitKey(0)
 
 
 
